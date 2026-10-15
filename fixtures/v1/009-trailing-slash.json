@@ -1,0 +1,38 @@
+{
+  "description": "A single trailing slash is ignored.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz/",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

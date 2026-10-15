@@ -1,0 +1,42 @@
+{
+  "description": "Under slug addressing the second segment is always the slug, so a slug named start gets a success ping.",
+  "known_monitors": [
+    {
+      "project_key": "pk_abcdefghijklmnopqrstuvwxyz",
+      "slug": "start",
+      "create": false
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/pk_abcdefghijklmnopqrstuvwxyz/start",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "project_key": "pk_abcdefghijklmnopqrstuvwxyz",
+      "slug": "start",
+      "create": false
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

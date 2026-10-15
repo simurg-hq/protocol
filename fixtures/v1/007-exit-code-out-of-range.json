@@ -1,0 +1,21 @@
+{
+  "description": "An exit code above 255 is a malformed path: 400 and no event.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz/256",
+    "headers": {}
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

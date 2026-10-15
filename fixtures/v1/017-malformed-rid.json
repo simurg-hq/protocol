@@ -1,0 +1,21 @@
+{
+  "description": "A rid that is not a ULID is rejected: 400 and no event.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz?rid=not-a-ulid",
+    "headers": {}
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ping event, version 1",
+  "description": "The event a receiver emits for every accepted ping. See SPEC.md, section Event. Unknown fields are allowed because version 1 may add optional fields.",
+  "type": "object",
+  "required": [
+    "v",
+    "id",
+    "kind",
+    "received_at",
+    "monitor",
+    "run_id",
+    "exit_code",
+    "unverified",
+    "source",
+    "idempotency_key",
+    "metrics",
+    "metrics_rejected",
+    "output",
+    "output_truncated"
+  ],
+  "properties": {
+    "v": { "const": 1 },
+    "id": { "$ref": "#/$defs/ulid" },
+    "kind": { "enum": ["start", "success", "fail", "exit"] },
+    "received_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "monitor": { "$ref": "#/$defs/monitor" },
+    "run_id": {
+      "oneOf": [{ "$ref": "#/$defs/ulid" }, { "type": "null" }]
+    },
+    "exit_code": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0, "maximum": 255 },
+        { "type": "null" }
+      ]
+    },
+    "unverified": { "type": "boolean" },
+    "source": { "enum": ["cli", "sdk", "http"] },
+    "idempotency_key": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[!-~]{1,128}$" },
+        { "type": "null" }
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9_.]{1,64}$" },
+      "additionalProperties": { "type": "number" }
+    },
+    "metrics_rejected": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 64 },
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "output": {
+      "oneOf": [{ "type": "string", "maxLength": 10240 }, { "type": "null" }]
+    },
+    "output_truncated": { "type": "boolean" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "exit" } } },
+      "then": { "properties": { "exit_code": { "type": "integer" } } },
+      "else": { "properties": { "exit_code": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "start" } } },
+      "then": { "properties": { "run_id": { "type": "string" } } }
+    }
+  ],
+  "$defs": {
+    "ulid": {
+      "type": "string",
+      "pattern": "^[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "monitor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["token"],
+          "properties": {
+            "token": { "type": "string", "pattern": "^[a-z2-7]{26}$" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["project_key", "slug", "create"],
+          "properties": {
+            "project_key": { "type": "string", "pattern": "^pk_[a-z2-7]{26}$" },
+            "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+            "create": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

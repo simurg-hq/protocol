@@ -1,0 +1,49 @@
+{
+  "description": "A JSON body from the CLI with metrics and output. Invalid metric names are dropped and listed in metrics_rejected.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {
+      "User-Agent": "simurg-cli/0.1.0",
+      "Content-Type": "application/json",
+      "Idempotency-Key": "3f2c9a7e-retry-safe"
+    },
+    "body": "{\"metrics\": {\"processed\": 1240, \"errors\": 0, \"sys.max_rss_kb\": 51200, \"Bad Name\": 1}, \"output\": \"done\\n\"}"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "cli",
+    "idempotency_key": "3f2c9a7e-retry-safe",
+    "metrics": {
+      "processed": 1240,
+      "errors": 0,
+      "sys.max_rss_kb": 51200
+    },
+    "metrics_rejected": [
+      "Bad Name"
+    ],
+    "output": "done\n",
+    "output_truncated": false
+  }
+}
