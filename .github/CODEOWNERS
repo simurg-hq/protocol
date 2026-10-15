@@ -2,22 +2,22 @@
 # are guardrails (CI, agent instructions, analysis and test thresholds) that
 # must stay owner-approved even if the default owner changes.
 
-* @tkaratug
+* @simurg-hq/maintainers
 
 # CI and repository configuration
-/.github/ @tkaratug
-/Makefile @tkaratug
-/scripts/ci/ @tkaratug
-/lefthook.yml @tkaratug
-/.gitleaks.toml @tkaratug
+/.github/ @simurg-hq/maintainers
+/Makefile @simurg-hq/maintainers
+/scripts/ci/ @simurg-hq/maintainers
+/lefthook.yml @simurg-hq/maintainers
+/.gitleaks.toml @simurg-hq/maintainers
 
 # Agent instructions
-/AGENTS.md @tkaratug
-/CLAUDE.md @tkaratug
+/AGENTS.md @simurg-hq/maintainers
+/CLAUDE.md @simurg-hq/maintainers
 
 # Static analysis
-/.golangci.yml @tkaratug
+/.golangci.yml @simurg-hq/maintainers
 
 # Protocol contract: schemas and fixtures that every implementation tests against
-/schema/ @tkaratug
-/fixtures/ @tkaratug
+/schema/ @simurg-hq/maintainers
+/fixtures/ @simurg-hq/maintainers
