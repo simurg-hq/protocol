@@ -57,7 +57,11 @@ make help               # list all targets
 make lint-ci-scripts    # shellcheck for scripts/ci
 make test-ci-scripts    # bats tests for scripts/ci
 make pr-size            # measure this branch against origin/main
+make validate-schemas   # JSON Schemas, fixtures and schema test samples
 ```
+
+A schema change comes with samples in `schema/testdata/*/valid` and
+`schema/testdata/*/invalid` that show what it accepts and rejects.
 
 A task that adds a gate also adds its `make` target and lists it here.
 
