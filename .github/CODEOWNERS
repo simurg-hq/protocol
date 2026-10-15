@@ -1,0 +1,23 @@
+# Code owners. Every path needs the owner's review; the explicit entries below
+# are guardrails (CI, agent instructions, analysis and test thresholds) that
+# must stay owner-approved even if the default owner changes.
+
+* @tkaratug
+
+# CI and repository configuration
+/.github/ @tkaratug
+/Makefile @tkaratug
+/scripts/ci/ @tkaratug
+/lefthook.yml @tkaratug
+/.gitleaks.toml @tkaratug
+
+# Agent instructions
+/AGENTS.md @tkaratug
+/CLAUDE.md @tkaratug
+
+# Static analysis
+/.golangci.yml @tkaratug
+
+# Protocol contract: schemas and fixtures that every implementation tests against
+/schema/ @tkaratug
+/fixtures/ @tkaratug
