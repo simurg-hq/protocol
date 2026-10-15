@@ -4,7 +4,7 @@ BASE ?= origin/main
 HEAD_REF ?= HEAD
 CI_TOOLS_IMAGE := $(notdir $(CURDIR))-ci-tools:local
 SHELLCHECK_IMAGE := koalaman/shellcheck:v0.11.0
-DOCKER_RUN := docker run --rm -v "$(CURDIR):/work" -w /work
+DOCKER_RUN := docker run --rm -v "$(CURDIR):/work" -w /work -e PR_SIZE_APPROVED
 
 .PHONY: help ci-tools-image pr-size test-ci-scripts lint-ci-scripts
 

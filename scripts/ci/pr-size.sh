@@ -3,6 +3,9 @@
 # Measures the size of a pull request, excluding tests and generated files.
 # Warns above WARN_LINES and fails above FAIL_LINES changed lines.
 #
+# A human can allow an oversized PR (e.g. an unmodified framework scaffold)
+# with the size-approved label; CI then sets PR_SIZE_APPROVED=true.
+#
 # Usage: pr-size.sh <base> [head]
 # Exclude patterns are read from .github/pr-size-exclude (one glob per line,
 # '#' starts a comment). A '*' in a pattern also matches '/'.
@@ -79,6 +82,10 @@ if [[ -n ${GITHUB_STEP_SUMMARY:-} ]]; then
     echo "$summary" >>"$GITHUB_STEP_SUMMARY"
 fi
 
+if ((counted > FAIL_LINES)) && [[ ${PR_SIZE_APPROVED:-} == true ]]; then
+    echo "::notice::This PR changes $counted lines (limit $FAIL_LINES) but carries the size-approved label set by a human."
+    exit 0
+fi
 if ((counted > FAIL_LINES)); then
     echo "::error::This PR changes $counted lines outside tests and generated files (limit $FAIL_LINES). Split the task."
     exit 1

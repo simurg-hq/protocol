@@ -6,6 +6,7 @@ load '/usr/lib/bats/bats-assert/load'
 SCRIPT="$BATS_TEST_DIRNAME/../pr-size.sh"
 
 setup() {
+    unset PR_SIZE_APPROVED GITHUB_STEP_SUMMARY
     cd "$BATS_TEST_TMPDIR"
     git init -q -b main repo
     cd repo
@@ -137,4 +138,26 @@ commit_all() {
 
     assert_failure 2
     assert_output --partial "unknown revision"
+}
+
+@test "passes above 800 lines when the PR is size-approved" {
+    write_lines src/a.txt 801
+    commit_all
+    export PR_SIZE_APPROVED=true
+
+    run "$SCRIPT" main
+
+    assert_success
+    assert_output --partial "::notice::"
+    assert_output --partial "size-approved"
+}
+
+@test "treats any value other than true as not approved" {
+    write_lines src/a.txt 801
+    commit_all
+    export PR_SIZE_APPROVED=yes
+
+    run "$SCRIPT" main
+
+    assert_failure 1
 }

@@ -2,6 +2,8 @@ name: PR size
 
 on:
   pull_request:
+    # labeled/unlabeled re-run the check when size-approved changes.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -18,4 +20,5 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_SIZE_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'size-approved') }}
         run: make pr-size BASE="$BASE_SHA" HEAD_REF="$HEAD_SHA"
