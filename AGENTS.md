@@ -58,7 +58,16 @@ make lint-ci-scripts    # shellcheck for scripts/ci
 make test-ci-scripts    # bats tests for scripts/ci
 make pr-size            # measure this branch against origin/main
 make validate-schemas   # JSON Schemas, fixtures and schema test samples
+make check              # all Go gates below
+make fmt-check          # gofmt
+make lint               # golangci-lint (.golangci.yml)
+make test               # go test -race
+make vulncheck          # govulncheck
+make secrets            # gitleaks over the git history
 ```
+
+The Go tests validate every fixture against the schemas, so a fixture change
+also runs `make test`.
 
 A schema change comes with samples in `schema/testdata/*/valid` and
 `schema/testdata/*/invalid` that show what it accepts and rejects.
