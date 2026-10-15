@@ -1,0 +1,42 @@
+{
+  "description": "A fail ping by slug from an SDK, with create=1, for a monitor the receiver does not know yet. HEAD responses have no body.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "HEAD",
+    "path": "/ping/pk_abcdefghijklmnopqrstuvwxyz/nightly-backup/fail?create=1",
+    "headers": {
+      "User-Agent": "simurg-laravel/0.1.0"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": ""
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "fail",
+    "received_at": "$any",
+    "monitor": {
+      "project_key": "pk_abcdefghijklmnopqrstuvwxyz",
+      "slug": "nightly-backup",
+      "create": true
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": true,
+    "source": "sdk",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

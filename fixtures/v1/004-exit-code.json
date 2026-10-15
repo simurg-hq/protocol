@@ -1,0 +1,38 @@
+{
+  "description": "An exit code ping. 137 is a failure (128 + SIGKILL).",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz/137",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "exit",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": 137,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

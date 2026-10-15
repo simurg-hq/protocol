@@ -1,0 +1,38 @@
+{
+  "description": "A success ping with rid closes that run.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz?rid=01JA2B3C4D5E6F7G8H9JKMNPQR",
+    "headers": {}
+  },
+  "response": {
+    "status": 99,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": "01JA2B3C4D5E6F7G8H9JKMNPQR",
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

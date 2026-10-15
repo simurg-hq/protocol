@@ -1,0 +1,22 @@
+{
+  "description": "Methods other than GET, HEAD and POST get 405 with an Allow header.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "PUT",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {}
+  },
+  "response": {
+    "status": 405,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Allow": "GET, HEAD, POST"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

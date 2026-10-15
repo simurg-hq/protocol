@@ -11,7 +11,13 @@ Prerequisites:
 
 All language toolchains and quality gates run in pinned Docker images, so nothing else needs to be installed on the host.
 
-Test commands will be added together with the fixtures and Go package.
+Validate the JSON Schemas and fixtures:
+
+```sh
+make validate-schemas
+```
+
+See [SPEC.md](SPEC.md) for the protocol and [fixtures/README.md](fixtures/README.md) for the fixture format.
 
 ## License
 

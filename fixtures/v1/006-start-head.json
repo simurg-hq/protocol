@@ -1,0 +1,39 @@
+{
+  "description": "A HEAD start ping returns the run ID only in the Run-Id header.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "HEAD",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz/start",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Run-Id": "$any"
+    },
+    "body": ""
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "start",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": "$any",
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": null,
+    "output_truncated": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "description": "A metrics field that is not an object is rejected as a whole.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    "body": "{\"metrics\": [1, 2]}"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [
+      "metrics"
+    ],
+    "output": null,
+    "output_truncated": false
+  }
+}

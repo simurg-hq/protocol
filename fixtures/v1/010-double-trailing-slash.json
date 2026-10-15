@@ -1,0 +1,21 @@
+{
+  "description": "Two trailing slashes form an empty segment: 400 and no event.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz//",
+    "headers": {}
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

@@ -1,0 +1,41 @@
+{
+  "description": "A JSON content type with a body that is not a JSON object is treated as text.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "[1, 2"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "success",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": "[1, 2",
+    "output_truncated": false
+  }
+}

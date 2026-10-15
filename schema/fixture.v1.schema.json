@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Protocol fixture, version 1",
+  "description": "One request and the response and event it must produce. See fixtures/README.md for the matching rules.",
+  "type": "object",
+  "required": ["description", "known_monitors", "request", "response", "event"],
+  "additionalProperties": false,
+  "properties": {
+    "description": { "type": "string", "minLength": 1 },
+    "known_monitors": {
+      "description": "Monitors the receiver knows before the request. A ping for any other monitor is accepted with unverified: true.",
+      "type": "array",
+      "items": { "$ref": "event.v1.schema.json#/$defs/monitor" }
+    },
+    "request": {
+      "type": "object",
+      "required": ["method", "path", "headers"],
+      "additionalProperties": false,
+      "properties": {
+        "method": { "type": "string", "pattern": "^[A-Z]+$" },
+        "path": {
+          "description": "Path including the query string.",
+          "type": "string",
+          "pattern": "^/"
+        },
+        "headers": { "$ref": "#/$defs/headers" },
+        "body": { "type": "string" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "required": ["status", "headers", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "headers": { "$ref": "#/$defs/headers" },
+        "body": { "type": "string" }
+      }
+    },
+    "event": {
+      "oneOf": [{ "$ref": "#/$defs/expected_event" }, { "type": "null" }]
+    }
+  },
+  "$defs": {
+    "any": { "const": "$any" },
+    "headers": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "expected_event": {
+      "type": "object",
+      "required": [
+        "v",
+        "id",
+        "kind",
+        "received_at",
+        "monitor",
+        "run_id",
+        "exit_code",
+        "unverified",
+        "source",
+        "idempotency_key",
+        "metrics",
+        "metrics_rejected",
+        "output",
+        "output_truncated"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "exit" } } },
+          "then": { "properties": { "exit_code": { "type": "integer" } } },
+          "else": { "properties": { "exit_code": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "start" } } },
+          "then": { "properties": { "run_id": { "type": "string" } } }
+        }
+      ],
+      "properties": {
+        "v": { "$ref": "event.v1.schema.json#/properties/v" },
+        "id": { "anyOf": [{ "$ref": "#/$defs/any" }, { "$ref": "event.v1.schema.json#/properties/id" }] },
+        "kind": { "$ref": "event.v1.schema.json#/properties/kind" },
+        "received_at": { "anyOf": [{ "$ref": "#/$defs/any" }, { "$ref": "event.v1.schema.json#/properties/received_at" }] },
+        "monitor": { "$ref": "event.v1.schema.json#/properties/monitor" },
+        "run_id": { "anyOf": [{ "$ref": "#/$defs/any" }, { "$ref": "event.v1.schema.json#/properties/run_id" }] },
+        "exit_code": { "$ref": "event.v1.schema.json#/properties/exit_code" },
+        "unverified": { "$ref": "event.v1.schema.json#/properties/unverified" },
+        "source": { "$ref": "event.v1.schema.json#/properties/source" },
+        "idempotency_key": { "$ref": "event.v1.schema.json#/properties/idempotency_key" },
+        "metrics": { "$ref": "event.v1.schema.json#/properties/metrics" },
+        "metrics_rejected": { "$ref": "event.v1.schema.json#/properties/metrics_rejected" },
+        "output": { "$ref": "event.v1.schema.json#/properties/output" },
+        "output_truncated": { "$ref": "event.v1.schema.json#/properties/output_truncated" }
+      }
+    }
+  }
+}
