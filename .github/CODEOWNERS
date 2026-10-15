@@ -1,0 +1,23 @@
+# Code owners. Every path needs the owner's review; the explicit entries below
+# are guardrails (CI, agent instructions, analysis and test thresholds) that
+# must stay owner-approved even if the default owner changes.
+
+* @simurg-hq/maintainers
+
+# CI and repository configuration
+/.github/ @simurg-hq/maintainers
+/Makefile @simurg-hq/maintainers
+/scripts/ci/ @simurg-hq/maintainers
+/lefthook.yml @simurg-hq/maintainers
+/.gitleaks.toml @simurg-hq/maintainers
+
+# Agent instructions
+/AGENTS.md @simurg-hq/maintainers
+/CLAUDE.md @simurg-hq/maintainers
+
+# Static analysis
+/.golangci.yml @simurg-hq/maintainers
+
+# Protocol contract: schemas and fixtures that every implementation tests against
+/schema/ @simurg-hq/maintainers
+/fixtures/ @simurg-hq/maintainers
