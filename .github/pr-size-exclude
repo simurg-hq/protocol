@@ -1,0 +1,12 @@
+# Paths excluded from the PR size check (scripts/ci/pr-size.sh).
+# One glob per line; '*' also matches '/'.
+
+# Tests
+*_test.go
+testdata/*
+*/testdata/*
+*.bats
+fixtures/*
+
+# Generated files
+go.sum
