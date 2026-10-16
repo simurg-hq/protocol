@@ -5,7 +5,7 @@ HEAD_REF ?= HEAD
 CI_TOOLS_IMAGE := $(notdir $(CURDIR))-ci-tools:local
 SHELLCHECK_IMAGE := koalaman/shellcheck:v0.11.0
 SCHEMA_IMAGE := $(notdir $(CURDIR))-schema:local
-DOCKER_RUN := docker run --rm -v "$(CURDIR):/work" -w /work -e PR_SIZE_APPROVED
+DOCKER_RUN := docker run --rm -v "$(CURDIR):/work" -w /work -e PR_SIZE_APPROVED -e TESTS_CHANGE_APPROVED
 
 GO_IMAGE := golang:1.26.9-trixie@sha256:f06b7122f888680048afb247c4e5f49c0069eb6c4c1ccae0f3f4834527a8d22c
 GOLANGCI_LINT_IMAGE := golangci/golangci-lint:v2.14.0@sha256:ad862ba6b3798cbe0fd9fd7408d498fd74fbd2623a92406b2fd3898faf0bf98f
@@ -14,7 +14,7 @@ GOVULNCHECK_VERSION := v1.9.0
 # Named volumes keep the Go module and build caches between runs.
 GO_RUN := $(DOCKER_RUN) -v $(notdir $(CURDIR))-go-mod:/go/pkg/mod -v $(notdir $(CURDIR))-go-build:/root/.cache/go-build
 
-.PHONY: help ci-tools-image schema-image pr-size test-ci-scripts lint-ci-scripts validate-schemas \
+.PHONY: help ci-tools-image schema-image pr-size test-tampering test-ci-scripts lint-ci-scripts validate-schemas \
 	check fmt-check lint test vulncheck secrets
 
 help: ## List available targets
@@ -25,6 +25,9 @@ ci-tools-image:
 
 pr-size: ci-tools-image ## Measure this branch against BASE (default origin/main)
 	$(DOCKER_RUN) --entrypoint bash $(CI_TOOLS_IMAGE) scripts/ci/pr-size.sh $(BASE) $(HEAD_REF)
+
+test-tampering: ci-tools-image ## Fail on assertions removed or changed and skips added in tests since BASE
+	$(DOCKER_RUN) --entrypoint bash $(CI_TOOLS_IMAGE) scripts/ci/test-tampering.sh $(BASE) $(HEAD_REF)
 
 test-ci-scripts: ci-tools-image ## Run the CI script tests
 	$(DOCKER_RUN) $(CI_TOOLS_IMAGE) scripts/ci/tests
