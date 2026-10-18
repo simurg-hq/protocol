@@ -35,6 +35,7 @@ add them.
 
 - The protocol is a contract. Within a version, changes are additive only: never change the meaning of an existing field or fixture. A breaking change needs a new version directory.
 - Every change to `SPEC.md` comes with fixtures that exercise it.
+- Consumers pin this module by tag. A merged change to `SPEC.md`, `schema/` or `fixtures/` is released as a new `v0.x.0` tag by a maintainer, and each consumer then updates its `go.mod` to that tag.
 - One task, one branch, one pull request against `main`. Keep the diff outside tests, fixtures and generated files under 400 lines; if it will not fit, stop and ask for the task to be split.
 - Never merge a pull request, push to `main`, or add or remove labels. A human merges, and the approval labels (`size-approved`, `tests-change-approved`) are a human's decision. Branch protection blocks merging a red pull request, but nothing on GitHub stops an agent from merging a green one or changing labels, so it is on you.
 - Touch only the files your task needs. If it needs files outside its scope, stop and ask for the task to be re-planned.
