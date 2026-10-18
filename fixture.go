@@ -1,7 +1,7 @@
 package protocol
 
 import (
-	"bytes"
+        "bytes"
 	"embed"
 	"encoding/json"
 	"errors"
