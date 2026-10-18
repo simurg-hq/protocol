@@ -14,7 +14,7 @@ GOVULNCHECK_VERSION := v1.9.0
 # Named volumes keep the Go module and build caches between runs.
 GO_RUN := $(DOCKER_RUN) -v $(notdir $(CURDIR))-go-mod:/go/pkg/mod -v $(notdir $(CURDIR))-go-build:/root/.cache/go-build
 
-.PHONY: help ci-tools-image schema-image pr-size test-tampering test-ci-scripts lint-ci-scripts validate-schemas \
+.PHONY: help ci-tools-image schema-image pr-size test-tampering test-ci-scripts lint-ci-scripts validate-schemas secrets-staged \
 	check fmt-check lint test vulncheck secrets
 
 help: ## List available targets
@@ -57,3 +57,9 @@ vulncheck: ## Check the Go code and its dependencies for known vulnerabilities
 
 secrets: ## Scan the git history for secrets with gitleaks
 	$(DOCKER_RUN) $(GITLEAKS_IMAGE) git --redact --no-banner -v .
+
+# `git commit -a` and `git commit <path>` stage into a temporary index that Git
+# names by its absolute host path; the container needs it relative to the repo.
+secrets-staged: ## Scan the staged changes for secrets with gitleaks (pre-commit hook)
+	$(DOCKER_RUN) -e GIT_INDEX_FILE=$(patsubst $(CURDIR)/%,%,$(or $(GIT_INDEX_FILE),.git/index)) \
+		$(GITLEAKS_IMAGE) git --staged --redact --no-banner -v .

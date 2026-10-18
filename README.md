@@ -11,6 +11,8 @@ Prerequisites:
 
 All language toolchains and quality gates run in pinned Docker images, so nothing else needs to be installed on the host.
 
+Run `lefthook install` once per clone to enable the Git hooks: format, static analysis and a secret scan on every commit. Tests run in CI on every pull request.
+
 Validate the JSON Schemas and fixtures:
 
 ```sh
