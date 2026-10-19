@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/fs"
 	"path"
+	"strings"
 )
 
 // Any matches any value in a fixture. Fixtures use it only for values the
@@ -41,6 +42,27 @@ type Request struct {
 	Headers map[string]string `json:"headers"`
 	// Body is nil when the request has no body.
 	Body *string `json:"body,omitempty"`
+	// BodyRepeat writes a large body compactly; at most one of Body and
+	// BodyRepeat is set. Use ExpandedBody to get the body to send.
+	BodyRepeat *Repeat `json:"body_repeat,omitempty"`
+}
+
+// Repeat is a body made of Text repeated Count times.
+type Repeat struct {
+	Text  string `json:"text"`
+	Count int    `json:"count"`
+}
+
+// ExpandedBody returns the body to send: Body as is, or BodyRepeat expanded.
+// ok is false when the request has no body.
+func (r Request) ExpandedBody() (body string, ok bool) {
+	switch {
+	case r.Body != nil:
+		return *r.Body, true
+	case r.BodyRepeat != nil:
+		return strings.Repeat(r.BodyRepeat.Text, r.BodyRepeat.Count), true
+	}
+	return "", false
 }
 
 // Response is the HTTP response a fixture expects.
@@ -71,14 +93,25 @@ func FixturesV1() ([]Fixture, error) {
 	return fixtures, nil
 }
 
-// loadFixture decodes one fixture strictly: unknown fields and trailing data
-// are errors, so a fixture the Go types cannot represent fails loudly.
+// loadFixture reads and decodes one embedded fixture.
 func loadFixture(p string) (Fixture, error) {
 	data, err := fixturesV1.ReadFile(p)
 	if err != nil {
 		return Fixture{}, err
 	}
 
+	fixture, err := decodeFixture(data)
+	if err != nil {
+		return Fixture{}, err
+	}
+	fixture.Name = path.Base(p)
+	return fixture, nil
+}
+
+// decodeFixture decodes a fixture strictly: unknown fields, trailing data and
+// a body_repeat the schema rejects are errors, so a fixture the Go types
+// cannot represent fails loudly.
+func decodeFixture(data []byte) (Fixture, error) {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	var fixture Fixture
@@ -89,6 +122,13 @@ func loadFixture(p string) (Fixture, error) {
 		return Fixture{}, errors.New("unexpected data after the fixture")
 	}
 
-	fixture.Name = path.Base(p)
+	if repeat := fixture.Request.BodyRepeat; repeat != nil {
+		switch {
+		case fixture.Request.Body != nil:
+			return Fixture{}, errors.New("request has both body and body_repeat")
+		case repeat.Text == "" || repeat.Count < 1:
+			return Fixture{}, errors.New("body_repeat needs a non-empty text and a count of at least 1")
+		}
+	}
 	return fixture, nil
 }

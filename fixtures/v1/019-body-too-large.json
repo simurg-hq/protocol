@@ -1,0 +1,27 @@
+{
+  "description": "A body larger than 100 KiB (102,401 bytes) is rejected: 413 and no event.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {
+      "Content-Type": "text/plain"
+    },
+    "body_repeat": {
+      "text": "a",
+      "count": 102401
+    }
+  },
+  "response": {
+    "status": 413,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

@@ -1,0 +1,44 @@
+{
+  "description": "A text body becomes the output.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz/fail",
+    "headers": {
+      "Content-Type": "text/plain"
+    },
+    "body_repeat": {
+      "text": "",
+      "count": 1
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "OK\n"
+  },
+  "event": {
+    "v": 1,
+    "id": "$any",
+    "kind": "fail",
+    "received_at": "$any",
+    "monitor": {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    },
+    "run_id": null,
+    "exit_code": null,
+    "unverified": false,
+    "source": "http",
+    "idempotency_key": null,
+    "metrics": {},
+    "metrics_rejected": [],
+    "output": "disk full\n",
+    "output_truncated": false
+  }
+}
