@@ -267,6 +267,8 @@ arch('controllers do not query the database')
     ]);
 EOF
     cp tests/Arch/ArchTest.php tests/Feature/ListTest.php
+    mkdir -p tests/Arch/Domain
+    printf '%s\n' '<?php' '' "arch('models')->expect('App\\Models')->toBeClasses();" > tests/Arch/Domain/ModelsTest.php
     printf '%s\n' '<?php' '' "pest()->extend(Tests\\TestCase::class)->in('Feature');" > tests/Pest.php
     cat > phpunit.xml <<'EOF'
 <phpunit>
@@ -316,6 +318,43 @@ EOF
 
     assert_failure 1
     assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file deleted or moved"
+}
+
+@test "fails when a strict file is moved within the strict paths" {
+    strict_base
+    git mv tests/Arch/ArchTest.php tests/Arch/LayersTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file deleted or moved"
+}
+
+@test "protects files in subdirectories of a strict glob" {
+    strict_base
+    echo "arch('enums')->expect('App\Enums')->toBeEnums();" >> tests/Arch/Domain/ModelsTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/Domain/ModelsTest.php::Strict test file changed"
+}
+
+@test "treats an empty strict list as no strict paths" {
+    git switch -q main
+    echo 'STRICT_TEST_PATHS :=' > Makefile
+    commit_all
+    git switch -q -C feature main
+    echo '// change' >> src/Run.php
+    echo '// note' >> tests/Feature/RunTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_success
+    refute_output --partial "Strict test file"
 }
 
 @test "fails when one line of a multi-line arch list is removed" {
