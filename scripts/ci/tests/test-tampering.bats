@@ -389,6 +389,32 @@ EOF
     assert_output --partial "No assertions removed or changed and no skips added"
 }
 
+@test "fails when git cannot diff the branch against the base" {
+    git switch -q --orphan unrelated
+    mkdir -p src
+    echo '<?php' > src/Other.php
+    commit_all
+
+    run "$SCRIPT" main unrelated
+
+    assert_failure
+    refute_output --partial "No assertions removed or changed"
+}
+
+@test "fails when the strict list of the base is not a valid pathspec" {
+    git switch -q main
+    echo 'STRICT_TEST_PATHS := :(nosuchmagic)tests' > Makefile
+    commit_all
+    git switch -q -C feature main
+    echo '// change' >> src/Run.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure
+    refute_output --partial "No assertions removed or changed"
+}
+
 @test "exits with usage error for an unknown base" {
     run "$SCRIPT" no-such-branch
 
