@@ -20,7 +20,8 @@ meaning; new behavior gets new fixtures.
 | `request.method` | HTTP method. |
 | `request.path` | Path including the query string, sent as is. |
 | `request.headers` | Request headers. No other headers are sent; a missing `User-Agent` means no such header. |
-| `request.body` | Request body as a string. Absent means no body. |
+| `request.body` | Request body as a string. Absent, together with `request.body_repeat`, means no body. |
+| `request.body_repeat` | A large body written compactly: `{"text": "a", "count": 102401}` is the body `text` repeated `count` times (here 102,401 bytes). Not allowed together with `request.body`. |
 | `response.status` | Expected status code. |
 | `response.headers` | Headers the response must contain. Names are compared case-insensitively; headers not listed are not checked. |
 | `response.body` | Expected body. Empty string for `HEAD` responses. |

@@ -1,0 +1,23 @@
+{
+  "description": "An Idempotency-Key with a character outside %x21-7E (here a space) is rejected: 400 and no event.",
+  "known_monitors": [
+    {
+      "token": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "path": "/ping/abcdefghijklmnopqrstuvwxyz",
+    "headers": {
+      "Idempotency-Key": "has space"
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "body": "$any"
+  },
+  "event": null
+}

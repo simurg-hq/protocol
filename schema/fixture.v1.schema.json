@@ -16,6 +16,7 @@
       "type": "object",
       "required": ["method", "path", "headers"],
       "additionalProperties": false,
+      "not": { "required": ["body", "body_repeat"] },
       "properties": {
         "method": { "type": "string", "pattern": "^[A-Z]+$" },
         "path": {
@@ -24,7 +25,17 @@
           "pattern": "^/"
         },
         "headers": { "$ref": "#/$defs/headers" },
-        "body": { "type": "string" }
+        "body": { "type": "string" },
+        "body_repeat": {
+          "description": "A large body written compactly: text repeated count times. Not allowed together with body.",
+          "type": "object",
+          "required": ["text", "count"],
+          "additionalProperties": false,
+          "properties": {
+            "text": { "type": "string", "minLength": 1 },
+            "count": { "type": "integer", "minimum": 1 }
+          }
+        }
       }
     },
     "response": {
