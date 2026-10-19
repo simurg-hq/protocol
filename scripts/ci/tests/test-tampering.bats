@@ -243,6 +243,217 @@ EOF
     assert_failure 1
 }
 
+# Adds a Makefile with a strict list and the files on it to main, and starts
+# the feature branch again from there.
+strict_base() {
+    git switch -q main
+    mkdir -p tests/Arch
+    echo 'STRICT_TEST_PATHS := tests/Arch/* tests/Pest.php phpunit.xml' > Makefile
+    cat > tests/Arch/ArchTest.php <<'EOF'
+<?php
+
+arch('the domain does not depend on the HTTP layer')
+    ->expect('App\Domain')
+    ->not->toUse([
+        'App\Http',
+        'Illuminate\Http',
+    ]);
+
+arch('controllers do not query the database')
+    ->expect('App\Http\Controllers')
+    ->not->toUse('Illuminate\Support\Facades\DB')
+    ->ignoring([
+        'App\Http\Controllers\HealthController',
+    ]);
+EOF
+    cp tests/Arch/ArchTest.php tests/Feature/ListTest.php
+    mkdir -p tests/Arch/Domain
+    printf '%s\n' '<?php' '' "arch('models')->expect('App\\Models')->toBeClasses();" > tests/Arch/Domain/ModelsTest.php
+    printf '%s\n' '<?php' '' "pest()->extend(Tests\\TestCase::class)->in('Feature');" > tests/Pest.php
+    cat > phpunit.xml <<'EOF'
+<phpunit>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
+EOF
+    git add -A
+    git commit -q -m strict
+    git switch -q -C feature main
+}
+
+@test "allows a new file on a strict path" {
+    strict_base
+    echo '<?php' > tests/Arch/NewTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_success
+    assert_output --partial "No assertions removed or changed and no skips added"
+}
+
+@test "fails when a strict file is deleted" {
+    strict_base
+    git rm -q tests/Pest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Pest.php::Strict test file deleted or moved"
+}
+
+@test "fails when a strict file is moved off the strict paths" {
+    strict_base
+    git mv tests/Arch/ArchTest.php tests/Feature/ArchTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file deleted or moved"
+}
+
+@test "fails when a strict file is moved within the strict paths" {
+    strict_base
+    git mv tests/Arch/ArchTest.php tests/Arch/LayersTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file deleted or moved"
+}
+
+@test "protects files in subdirectories of a strict glob" {
+    strict_base
+    echo "arch('enums')->expect('App\Enums')->toBeEnums();" >> tests/Arch/Domain/ModelsTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/Domain/ModelsTest.php::Strict test file changed"
+}
+
+@test "treats an empty strict list as no strict paths" {
+    git switch -q main
+    echo 'STRICT_TEST_PATHS :=' > Makefile
+    commit_all
+    git switch -q -C feature main
+    echo '// change' >> src/Run.php
+    echo '// note' >> tests/Feature/RunTest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_success
+    refute_output --partial "Strict test file"
+}
+
+@test "fails when one line of a multi-line arch list is removed" {
+    strict_base
+    replace tests/Arch/ArchTest.php "        'Illuminate\\Http',"$'\n' ""
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file changed"
+}
+
+@test "fails when a line is added to an exception list" {
+    strict_base
+    replace tests/Arch/ArchTest.php "        'App\\Http\\Controllers\\HealthController',"$'\n' \
+        "        'App\\Http\\Controllers\\HealthController',"$'\n'"        'App\\Http\\Controllers\\ReportController',"$'\n'
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Arch/ArchTest.php::Strict test file changed"
+}
+
+@test "fails when a directory is removed from phpunit.xml" {
+    strict_base
+    replace phpunit.xml "            <directory>tests/Feature</directory>"$'\n' ""
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=phpunit.xml::Strict test file changed"
+}
+
+@test "reads the strict list from the base, not from the branch" {
+    strict_base
+    echo 'STRICT_TEST_PATHS :=' > Makefile
+    echo '// change' >> tests/Pest.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure 1
+    assert_output --partial "::error file=tests/Pest.php::Strict test file changed"
+}
+
+@test "passes strict changes with a warning when approved by a human" {
+    strict_base
+    git rm -q tests/Pest.php
+    replace phpunit.xml "            <directory>tests/Feature</directory>"$'\n' ""
+    commit_all
+
+    TESTS_CHANGE_APPROVED=true run "$SCRIPT" main
+
+    assert_success
+    assert_output --partial "::warning file=tests/Pest.php::Strict test file deleted or moved"
+    assert_output --partial "::warning file=phpunit.xml::Strict test file changed"
+    assert_output --partial "2 test change(s) allowed by the tests-change-approved label"
+}
+
+@test "keeps the old rules for the same change outside the strict paths" {
+    strict_base
+    replace tests/Feature/ListTest.php "        'Illuminate\\Http',"$'\n' ""
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_success
+    assert_output --partial "No assertions removed or changed and no skips added"
+}
+
+@test "fails when git cannot diff the branch against the base" {
+    git switch -q --orphan unrelated
+    mkdir -p src
+    echo '<?php' > src/Other.php
+    commit_all
+
+    run "$SCRIPT" main unrelated
+
+    assert_failure
+    refute_output --partial "No assertions removed or changed"
+}
+
+@test "fails when the strict list of the base is not a valid pathspec" {
+    git switch -q main
+    echo 'STRICT_TEST_PATHS := :(nosuchmagic)tests' > Makefile
+    commit_all
+    git switch -q -C feature main
+    echo '// change' >> src/Run.php
+    commit_all
+
+    run "$SCRIPT" main
+
+    assert_failure
+    refute_output --partial "No assertions removed or changed"
+}
+
 @test "exits with usage error for an unknown base" {
     run "$SCRIPT" no-such-branch
 
