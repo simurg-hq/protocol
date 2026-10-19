@@ -2,6 +2,10 @@
 
 BASE ?= origin/main
 HEAD_REF ?= HEAD
+# Files test-tampering protects line by line (git pathspecs; * also matches /).
+# It reads this line from the base of the pull request, so a change to the
+# list takes effect only after it is merged.
+STRICT_TEST_PATHS :=
 CI_TOOLS_IMAGE := $(notdir $(CURDIR))-ci-tools:local
 SHELLCHECK_IMAGE := koalaman/shellcheck:v0.11.0
 SCHEMA_IMAGE := $(notdir $(CURDIR))-schema:local
@@ -26,7 +30,7 @@ ci-tools-image:
 pr-size: ci-tools-image ## Measure this branch against BASE (default origin/main)
 	$(DOCKER_RUN) --entrypoint bash $(CI_TOOLS_IMAGE) scripts/ci/pr-size.sh $(BASE) $(HEAD_REF)
 
-test-tampering: ci-tools-image ## Fail on assertions removed or changed and skips added in tests since BASE
+test-tampering: ci-tools-image ## Fail on assertions removed or changed and skips added in tests since BASE, and on any change to STRICT_TEST_PATHS
 	$(DOCKER_RUN) --entrypoint bash $(CI_TOOLS_IMAGE) scripts/ci/test-tampering.sh $(BASE) $(HEAD_REF)
 
 test-ci-scripts: ci-tools-image ## Run the CI script tests

@@ -4,6 +4,11 @@
 # assertion line (which includes a changed expected value) or an added skip.
 # New test files, new tests and new assertions are always allowed.
 #
+# Files on the STRICT_TEST_PATHS list of the Makefile (globs, where * also
+# matches /) are protected line by line: any change, deletion or move of such
+# a file is a finding; adding a new one is not. The list is read from the base,
+# so a pull request cannot narrow it for itself.
+#
 # A human can allow a deliberate change with the tests-change-approved label;
 # CI then sets TESTS_CHANGE_APPROVED=true.
 #
@@ -72,7 +77,31 @@ scan_diff() {
     '
 }
 
-findings=$(git diff --no-color --no-ext-diff --unified=0 -M --src-prefix=a/ --dst-prefix=b/ "$base...$head" | scan_diff)
+# The value of STRICT_TEST_PATHS in the base's Makefile; empty without one.
+# awk reads all input, so git show never dies of SIGPIPE.
+strict_paths=$(git show "$base:Makefile" 2>/dev/null | awk '
+    !found && /^STRICT_TEST_PATHS[[:space:]]*[:?]?=/ { sub(/^[^=]*=/, ""); sub(/#.*/, ""); print; found = 1 }
+' || true)
+
+# Prints one annotation per strict file that was changed, deleted or moved.
+# The globs are git pathspecs, read without pathname expansion. Without rename
+# detection a move shows as a deletion and an addition.
+scan_strict() {
+    local patterns status path
+    [[ -n ${strict_paths//[[:space:]]/} ]] || return 0
+    read -r -a patterns <<<"$strict_paths"
+    while IFS= read -r -d '' status && IFS= read -r -d '' path; do
+        case $status in
+            D) printf '::%s file=%s::Strict test file deleted or moved: %s\n' "$level" "$path" "$path" ;;
+            M | T) printf '::%s file=%s::Strict test file changed: %s\n' "$level" "$path" "$path" ;;
+        esac
+    done < <(git diff --no-color --no-ext-diff --name-status --no-renames -z "$base...$head" -- "${patterns[@]}")
+}
+
+findings=$(
+    git diff --no-color --no-ext-diff --unified=0 -M --src-prefix=a/ --dst-prefix=b/ "$base...$head" | scan_diff
+    scan_strict
+)
 
 if [[ -z $findings ]]; then
     echo "No assertions removed or changed and no skips added in existing tests."
