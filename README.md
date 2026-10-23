@@ -7,11 +7,8 @@ The Simurg ping protocol: the specification, shared JSON contract fixtures and a
 Prerequisites:
 
 - [Docker](https://docs.docker.com/get-docker/) (OrbStack or Docker Desktop)
-- [Lefthook](https://lefthook.dev/) for Git hooks
 
-All language toolchains and quality gates run in pinned Docker images, so nothing else needs to be installed on the host.
-
-Run `lefthook install` once per clone to enable the Git hooks: format, static analysis and a secret scan on every commit. Tests run in CI on every pull request.
+All language toolchains run in pinned Docker images, so nothing else needs to be installed on the host.
 
 Validate the JSON Schemas and fixtures:
 
