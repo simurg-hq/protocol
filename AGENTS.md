@@ -37,3 +37,9 @@ not reference private repositories or internal documents.
 - Never hardcode the product name in user-facing text; if the Go package needs it, define it once as a constant and use that constant.
 - Never create or commit secrets, tokens or real credentials. Fixture tokens are obviously fake values.
 - Code, comments, commit messages and documents are in English.
+
+## Implementation
+
+- Meet every need the task states; check them one by one before calling the work done.
+- Follow the best practices of the language and its tools. Keep the code DRY and the design SOLID, without layers that only restate configuration.
+- Weigh performance and security in every change.
